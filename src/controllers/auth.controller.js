@@ -15,7 +15,27 @@ const register = async (req, res) => {
     res.status(201).json({ message: "User registered successfully", userId: result.insertedId });
 };
 
+const login = async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) return res.status(400).json({ message: "Both username and password are required." });
+
+    const user = await client.db("carRental").collection("users").findOne({ username });
+    if (user && await bcrypt.compare(password, user.password)) {
+        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        return res.json({ message: "Login successful", token });
+    }
+    res.status(401).json({ message: "Invalid username or password" });
+};
+
+const myProfile = async (req, res) => {
+    const user = await client.db("carRental").collection("users").findOne({ _id: new ObjectId(req.user.userId) });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ fullName: user.fullName, username: user.username, email: user.email });
+};
+
 
 module.exports = {
-    register
+    register,
+    login,
+    myProfile
 }
