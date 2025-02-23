@@ -1,6 +1,6 @@
 const express = require("express");
 const { getRentalCars } = require("../controllers/car.controller.js");
-const authMiddleware = require("../middleware/auth.middlware.js");
+const authMiddleware = require("../middleware/auth.middleware.js");
 
 const router = express.Router();
 
